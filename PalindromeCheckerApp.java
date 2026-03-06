@@ -1,27 +1,23 @@
 package PalindromeApps;
-import java.util.LinkedList;
-import java.util.Stack;
-import java.util.Queue;
+
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 public class PalindromeCheckerApp {
     public static void main(String[] args){
         String str = "malayalam";
-        Stack<Character> stk = new Stack<>();
-        Queue<Character> q = new LinkedList<>();
+        Deque<Character> dq = new ArrayDeque<Character>();
         for(char c : str.toCharArray()){
-            stk.push(c);
-            q.add(c);
+            dq.add(c);
         }
-        for(int i = 0; i < str.length() -1; i++){
-            if(str.charAt(i) != stk.pop()) return;
-        }
-
-        System.out.println("Palindrome using stk");
-
-        for(int i = str.length() - 1; i >= 0; i--){
-            if(str.charAt(i) != q.remove()) return;
+        for(int i = 0; i < (str.length() -1)/2; i++){
+            char a = dq.removeFirst();
+            char b = dq.removeLast();
+            if (a!=b) return;
         }
 
-        System.out.println("Palindrome using Q");
+        System.out.println("Palindrome using DQ");
+
     }
 }
