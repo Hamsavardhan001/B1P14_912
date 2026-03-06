@@ -4,11 +4,10 @@ import java.util.LinkedList;
 public class PalindromeCheckerApp {
     public static void main(String[] args){
         String str = "malayalam";
-        int i = 0; int j = str.length() - 1;
-        while(i<j){
-            if(str.charAt(i) != str.charAt(j)) return;
-            i++; j--;
+        String str1 = new String();
+        for(int i = str.length()-1 ; i >= 0; i--){
+            str1+=str.charAt(i);
         }
-        System.out.println("Palindrome");
+        System.out.println(str1.equals(str));
     }
 }
