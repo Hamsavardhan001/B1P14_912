@@ -1,92 +1,88 @@
 import java.util.*;
 
-// 1. Strategy Interface
+// Strategy Interface
 interface PalindromeStrategy {
     boolean isPalindrome(String input);
 }
 
-// 2. Stack-based Strategy
+// Stack-based approach
 class StackStrategy implements PalindromeStrategy {
-
-    @Override
     public boolean isPalindrome(String input) {
         Stack<Character> stack = new Stack<>();
+        for (char c : input.toCharArray()) stack.push(c);
 
         for (char c : input.toCharArray()) {
-            stack.push(c);
+            if (c != stack.pop()) return false;
         }
-
-        for (char c : input.toCharArray()) {
-            if (c != stack.pop()) {
-                return false;
-            }
-        }
-
         return true;
     }
 }
 
-// 3. Deque-based Strategy
+// Deque-based approach
 class DequeStrategy implements PalindromeStrategy {
-
-    @Override
     public boolean isPalindrome(String input) {
-        Deque<Character> deque = new ArrayDeque<>();
+        Deque<Character> dq = new ArrayDeque<>();
+        for (char c : input.toCharArray()) dq.addLast(c);
 
-        for (char c : input.toCharArray()) {
-            deque.addLast(c);
+        while (dq.size() > 1) {
+            if (dq.removeFirst() != dq.removeLast()) return false;
         }
-
-        while (deque.size() > 1) {
-            if (deque.removeFirst() != deque.removeLast()) {
-                return false;
-            }
-        }
-
         return true;
     }
 }
 
-// 4. Context Class (Strategy Injector)
-class PalindromeContext {
+// Two-pointer (optimized O(1) space)
+class TwoPointerStrategy implements PalindromeStrategy {
+    public boolean isPalindrome(String input) {
+        int i = 0, j = input.length() - 1;
 
-    private PalindromeStrategy strategy;
-
-    public void setStrategy(PalindromeStrategy strategy) {
-        this.strategy = strategy;
-    }
-
-    public boolean check(String input) {
-        if (strategy == null) {
-            throw new IllegalStateException("Strategy not set");
+        while (i < j) {
+            if (input.charAt(i++) != input.charAt(j--)) return false;
         }
-
-        input = input.replaceAll("\\s+", "").toLowerCase();
-        return strategy.isPalindrome(input);
+        return true;
     }
 }
 
-// 5. Main Class
+// Benchmark Runner
+class Benchmark {
+
+    public static void run(String name, PalindromeStrategy strategy, String input, int iterations) {
+
+        // warm-up (avoids JVM bias)
+        for (int i = 0; i < 1000; i++) {
+            strategy.isPalindrome(input);
+        }
+
+        long start = System.nanoTime();
+
+        for (int i = 0; i < iterations; i++) {
+            strategy.isPalindrome(input);
+        }
+
+        long end = System.nanoTime();
+
+        long avgTime = (end - start) / iterations;
+
+        System.out.println(name + " -> Avg Time: " + avgTime + " ns");
+    }
+}
+
+// Main class
 public class Main {
 
     public static void main(String[] args) {
 
-        PalindromeContext context = new PalindromeContext();
+        String input = "madamimadamracecarlevelmadamimadam";
+        int iterations = 100000;
 
-        String input = "racecar";
+        PalindromeStrategy stack = new StackStrategy();
+        PalindromeStrategy deque = new DequeStrategy();
+        PalindromeStrategy twoPointer = new TwoPointerStrategy();
 
-        // Strategy 1: Stack
-        context.setStrategy(new StackStrategy());
-        System.out.println("Stack Strategy: " + context.check(input));
+        System.out.println("=== Palindrome Performance Benchmark ===");
 
-        // Strategy 2: Deque
-        context.setStrategy(new DequeStrategy());
-        System.out.println("Deque Strategy: " + context.check(input));
-
-        // Try another input
-        String input2 = "hello";
-
-        context.setStrategy(new DequeStrategy());
-        System.out.println("Deque Strategy (hello): " + context.check(input2));
+        Benchmark.run("Stack Strategy", stack, input, iterations);
+        Benchmark.run("Deque Strategy", deque, input, iterations);
+        Benchmark.run("Two Pointer Strategy", twoPointer, input, iterations);
     }
 }
