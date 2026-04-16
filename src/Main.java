@@ -1,109 +1,49 @@
-public class Main {
+import java.util.Stack;
 
-    // Node definition
-    static class Node {
-        char data;
-        Node next;
+class PalindromeChecker {
 
-        Node(char data) {
-            this.data = data;
-        }
-    }
+    // Encapsulated logic: hidden from outside
+    private boolean isPalindromeUsingStack(String input) {
+        Stack<Character> stack = new Stack<>();
 
-    // Insert at end
-    static Node insert(Node head, char data) {
-        Node newNode = new Node(data);
-
-        if (head == null) return newNode;
-
-        Node temp = head;
-        while (temp.next != null) {
-            temp = temp.next;
-        }
-        temp.next = newNode;
-
-        return head;
-    }
-
-    // Find middle using slow-fast pointer
-    static Node findMiddle(Node head) {
-        Node slow = head;
-        Node fast = head;
-
-        while (fast != null && fast.next != null) {
-            slow = slow.next;
-            fast = fast.next.next;
+        // Push all characters into stack
+        for (char c : input.toCharArray()) {
+            stack.push(c);
         }
 
-        return slow;
-    }
-
-    // Reverse linked list
-    static Node reverse(Node head) {
-        Node prev = null;
-        Node current = head;
-
-        while (current != null) {
-            Node next = current.next;
-            current.next = prev;
-            prev = current;
-            current = next;
-        }
-
-        return prev;
-    }
-
-    // Check palindrome
-    static boolean isPalindrome(Node head) {
-        if (head == null || head.next == null) return true;
-
-        // Step 1: Find middle
-        Node middle = findMiddle(head);
-
-        // Step 2: Reverse second half
-        Node secondHalf = reverse(middle);
-
-        // Step 3: Compare first and second half
-        Node firstHalf = head;
-        Node tempSecond = secondHalf;
-
-        while (tempSecond != null) {
-            if (firstHalf.data != tempSecond.data) {
+        // Compare with original string
+        for (char c : input.toCharArray()) {
+            if (c != stack.pop()) {
                 return false;
             }
-            firstHalf = firstHalf.next;
-            tempSecond = tempSecond.next;
         }
 
         return true;
     }
 
-    // Print list (debug helper)
-    static void print(Node head) {
-        Node temp = head;
-        while (temp != null) {
-            System.out.print(temp.data + " -> ");
-            temp = temp.next;
-        }
-        System.out.println("null");
+    // Public API (Single Responsibility Principle)
+    public boolean checkPalindrome(String input) {
+        if (input == null) return false;
+
+        // Optional normalization (case-insensitive check)
+        input = input.replaceAll("\\s+", "").toLowerCase();
+
+        return isPalindromeUsingStack(input);
     }
+}
+
+public class Main {
 
     public static void main(String[] args) {
 
-        String input = "racecar"; // try "hello" or "madam"
+        PalindromeChecker checker = new PalindromeChecker();
 
-        Node head = null;
+        String input1 = "racecar";
+        String input2 = "hello";
+        String input3 = "Madam";
 
-        // Convert string to linked list
-        for (char c : input.toCharArray()) {
-            head = insert(head, c);
-        }
-
-        System.out.println("Linked List:");
-        print(head);
-
-        boolean result = isPalindrome(head);
-
-        System.out.println("Is Palindrome? " + result);
+        System.out.println(input1 + " -> " + checker.checkPalindrome(input1));
+        System.out.println(input2 + " -> " + checker.checkPalindrome(input2));
+        System.out.println(input3 + " -> " + checker.checkPalindrome(input3));
     }
 }
